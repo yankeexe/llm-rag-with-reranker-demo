@@ -2,6 +2,8 @@
 
 Demo LLM app with RAG for the YouTube video.
 
+🚨 NOTE: **Requires `Python > 3.10` with  `SQLite > 3.35`**
+
 Watch the video 👇
 
 <a href="https://youtu.be/1y2TohQdNbo">
