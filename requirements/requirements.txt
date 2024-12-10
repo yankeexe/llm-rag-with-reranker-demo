@@ -4,4 +4,4 @@ sentence-transformers==3.3.1 # CrossEncoder Re-ranking
 streamlit==1.40.1 # Application UI
 PyMuPDF==1.24.14 # PDF Document loader
 langchain-community==0.3.7 # Utils for text splitting
-pysqlite3-binary==0.5.4
+

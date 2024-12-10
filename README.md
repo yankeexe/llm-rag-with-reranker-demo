@@ -51,3 +51,7 @@ make
 
 make help
 ```
+
+## 🔧 Common Issues and Fixes
+
+- If you run into any errors with incompatible version of ChromaDB/Sqlite3, refer to [this solution](https://docs.trychroma.com/troubleshooting#sqlite).
