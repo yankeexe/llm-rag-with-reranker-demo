@@ -1,7 +1,8 @@
+chromadb==0.5.23 # Vector Database
+langchain-community==0.3.7 # Utils for text splitting
+langchain-ollama==0.2.2 # Ollama embedding provider
+langchain-redis==0.1.2 # Redis semantic cache provider
 ollama==0.3.3 # Local inference
-chromadb==0.5.20 # Vector Database
+PyMuPDF==1.24.14 # PDF Document loader
 sentence-transformers==3.3.1 # CrossEncoder Re-ranking
 streamlit==1.40.1 # Application UI
-PyMuPDF==1.24.14 # PDF Document loader
-langchain-community==0.3.7 # Utils for text splitting
-
