@@ -90,9 +90,7 @@ def get_redis_store() -> RedisVectorStore:
     )
 
 
-def get_vector_collection(
-    collection_name: str,
-) -> chromadb.Collection:
+def get_vector_collection() -> chromadb.Collection:
     """Gets or creates a ChromaDB collection for vector storage.
 
     Creates an Ollama embedding function using the nomic-embed-text model and initializes
@@ -110,15 +108,13 @@ def get_vector_collection(
 
     chroma_client = chromadb.PersistentClient(path="./demo-rag-chroma-db")
     return chroma_client.get_or_create_collection(
-        name=collection_name,
+        name="rag_app",
         embedding_function=ollama_ef,
         metadata={"hnsw:space": "cosine"},
     )
 
 
-def add_to_vector_collection(
-    collection_name: str, all_splits: list[Document], file_name: str
-):
+def add_to_vector_collection(all_splits: list[Document], file_name: str):
     """Adds document splits to a vector collection for semantic search.
 
     Takes a list of document splits and adds them to a ChromaDB vector collection
@@ -134,7 +130,7 @@ def add_to_vector_collection(
     Raises:
         ChromaDBError: If there are issues upserting documents to the collection
     """
-    collection = get_vector_collection(collection_name)
+    collection = get_vector_collection()
     documents, metadatas, ids = [], [], []
 
     for idx, split in enumerate(all_splits):
@@ -150,7 +146,7 @@ def add_to_vector_collection(
     st.success("Data added to the vector store!")
 
 
-def query_collection(collection_name: str, prompt: str, n_results: int = 10):
+def query_collection(prompt: str, n_results: int = 10):
     """Queries the vector collection with a given prompt to retrieve relevant documents.
 
     Args:
@@ -163,7 +159,7 @@ def query_collection(collection_name: str, prompt: str, n_results: int = 10):
     Raises:
         ChromaDBError: If there are issues querying the collection.
     """
-    collection = get_vector_collection(collection_name)
+    collection = get_vector_collection()
     results = collection.query(query_texts=[prompt], n_results=n_results)
     return results
 
@@ -299,9 +295,7 @@ if __name__ == "__main__":
                 all_splits = create_cached_contents(uploaded_file)
             else:
                 all_splits = process_document(uploaded_file)
-                add_to_vector_collection(
-                    "rag_app", all_splits, normalize_uploaded_file_name
-                )
+                add_to_vector_collection(all_splits, normalize_uploaded_file_name)
 
     # Question and Answer Area
     st.header("🗣️ RAG Question Answer")
@@ -316,7 +310,7 @@ if __name__ == "__main__":
         if cached_results:
             st.write(cached_results[0][0].metadata["answer"].replace("\\n", "\n"))
         else:
-            results = query_collection(prompt=prompt, collection_name="rag_app")
+            results = query_collection(prompt=prompt)
 
             context = results.get("documents")[0]
             if not context:
