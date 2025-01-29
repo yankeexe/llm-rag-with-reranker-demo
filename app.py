@@ -106,7 +106,7 @@ def get_vector_collection() -> chromadb.Collection:
         model_name="nomic-embed-text:latest",
     )
 
-    chroma_client = chromadb.PersistentClient(path="./demo-rag-chroma-db")
+    chroma_client = chromadb.PersistentClient(path="./demo-rag-chroma")
     return chroma_client.get_or_create_collection(
         name="rag_app",
         embedding_function=ollama_ef,
