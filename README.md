@@ -1,6 +1,6 @@
 # 📑 RAG with Semantic Cache Demo Application
 
-Demo LLM RAG app with Semantic Caching for the YouTube video.
+Demo RAG app with Semantic Caching for the YouTube video.
 
 🚨 NOTE: **Requires `Python > 3.10` with  `SQLite > 3.35`**
 
