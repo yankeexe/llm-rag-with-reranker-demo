@@ -171,8 +171,8 @@ def query_semantic_cache(query: str, n_results: int = 1, threshold: float = 80.0
     if not results:
         return None
 
-    percentage = (1 - abs(results[0][1])) * 100
-    if percentage >= threshold:
+    match_percentage = (1 - abs(results[0][1])) * 100
+    if match_percentage >= threshold:
         return results
     return None
 
