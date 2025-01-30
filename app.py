@@ -42,6 +42,93 @@ Important: Base your entire response solely on the information provided in the c
 """
 
 
+def get_redis_store() -> RedisVectorStore:
+    """Gets or creates a Redis vector store for caching embeddings.
+
+    Creates an Ollama embeddings object using the nomic-embed-text model and initializes
+    a Redis vector store with cosine similarity metric for storing cached question-answer pairs.
+
+    Returns:
+        RedisVectorStore: A Redis vector store configured with Ollama embeddings and
+            metadata schema for storing answers.
+
+    Raises:
+        RedisConnectionError: If unable to connect to Redis.
+    """
+    embeddings = OllamaEmbeddings(
+        model="nomic-embed-text:latest",
+    )
+    return RedisVectorStore(
+        embeddings,
+        config=RedisConfig(
+            index_name="cached_contents",
+            redis_url="redis://localhost:6379",
+            distance_metric="COSINE",
+            metadata_schema=[
+                {"name": "answer", "type": "text"},
+            ],
+        ),
+    )
+
+
+def create_cached_contents(uploaded_file: UploadedFile) -> list[Document]:
+    """Creates cached question-answer pairs from an uploaded CSV file.
+
+    Takes an uploaded CSV file containing question-answer pairs, converts them to Document
+    objects and adds them to a Redis vector store for caching.
+
+    Args:
+        uploaded_file: A Streamlit UploadedFile object containing the CSV data with
+            'question' and 'answer' columns.
+
+    Returns:
+        list[Document]: List of Document objects created from the CSV rows.
+
+    Raises:
+        ValueError: If CSV is missing required 'question' or 'answer' columns.
+        RedisConnectionError: If unable to add documents to Redis vector store.
+    """
+    data = uploaded_file.getvalue().decode("utf-8")
+    csv_reader = csv.DictReader(StringIO(data))
+
+    docs = []
+    for row in csv_reader:
+        docs.append(
+            Document(page_content=row["question"], metadata={"answer": row["answer"]})
+        )
+    vector_store = get_redis_store()
+    vector_store.add_documents(docs)
+    st.success("Cache contents added!")
+
+
+def query_semantic_cache(query: str, n_results: int = 1, threshold: float = 80.0):
+    """Queries the semantic cache for similar questions and returns cached results if found.
+
+    Args:
+        query: The search query text to find relevant cached results.
+        n_results: Maximum number of results to return. Defaults to 1.
+        threshold: Minimum similarity score threshold (0-100) for returning cached results.
+            Defaults to 80.0.
+
+    Returns:
+        list: List of tuples containing matched Documents and their similarity scores if
+            matches above threshold are found. None if no matches above threshold.
+
+    Raises:
+        RedisConnectionError: If there are issues connecting to Redis.
+    """
+    vector_store = get_redis_store()
+    results = vector_store.similarity_search_with_score(query, k=n_results)
+
+    if not results:
+        return None
+
+    match_percentage = (1 - abs(results[0][1])) * 100
+    if match_percentage >= threshold:
+        return results
+    return None
+
+
 def process_document(uploaded_file: UploadedFile) -> list[Document]:
     """Processes an uploaded PDF file by converting it to text chunks.
 
@@ -71,23 +158,6 @@ def process_document(uploaded_file: UploadedFile) -> list[Document]:
         separators=["\n\n", "\n", ".", "?", "!", " ", ""],
     )
     return text_splitter.split_documents(docs)
-
-
-def get_redis_store() -> RedisVectorStore:
-    embeddings = OllamaEmbeddings(
-        model="nomic-embed-text:latest",
-    )
-    return RedisVectorStore(
-        embeddings,
-        config=RedisConfig(
-            index_name="cached_contents",
-            redis_url="redis://localhost:6379",
-            distance_metric="COSINE",
-            metadata_schema=[
-                {"name": "answer", "type": "text"},
-            ],
-        ),
-    )
 
 
 def get_vector_collection() -> chromadb.Collection:
@@ -164,19 +234,6 @@ def query_collection(prompt: str, n_results: int = 10):
     return results
 
 
-def query_semantic_cache(query: str, n_results: int = 1, threshold: float = 80.0):
-    vector_store = get_redis_store()
-    results = vector_store.similarity_search_with_score(query, k=n_results)
-
-    if not results:
-        return None
-
-    match_percentage = (1 - abs(results[0][1])) * 100
-    if match_percentage >= threshold:
-        return results
-    return None
-
-
 def call_llm(context: str, prompt: str):
     """Calls the language model with context and prompt to generate a response.
 
@@ -243,20 +300,6 @@ def re_rank_cross_encoders(documents: list[str]) -> tuple[str, list[int]]:
         relevant_text_ids.append(rank["corpus_id"])
 
     return relevant_text, relevant_text_ids
-
-
-def create_cached_contents(uploaded_file: UploadedFile) -> list[Document]:
-    data = uploaded_file.getvalue().decode("utf-8")
-    csv_reader = csv.DictReader(StringIO(data))
-
-    docs = []
-    for row in csv_reader:
-        docs.append(
-            Document(page_content=row["question"], metadata={"answer": row["answer"]})
-        )
-    vector_store = get_redis_store()
-    vector_store.add_documents(docs)
-    st.success("Cache contents added!")
 
 
 if __name__ == "__main__":
