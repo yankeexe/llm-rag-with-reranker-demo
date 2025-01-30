@@ -10,6 +10,15 @@ Watch the video 👇
 <img src="https://i.imgur.com/lJUyEm1.png" width="800">
 </a>
 
+---
+
+### Part II: Watch Optimizing RAG with Semantic Cache ⚡️
+
+<a href="https://youtu.be/0agBo7_wKTo">
+<img src="https://i.imgur.com/rJJaHmG.png" width="400">
+</a>
+
+
 ## 🤖 Prerequisites
 
 - [Ollama](https://ollama.dev/download)
