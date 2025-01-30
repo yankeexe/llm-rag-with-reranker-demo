@@ -3,6 +3,7 @@ SHELL :=/bin/bash
 .PHONY: clean check setup
 .DEFAULT_GOAL=help
 VENV_DIR = .venv
+PYTHON_VERSION = python3.10
 
 check: # Ruff check
 	@ruff check .
@@ -23,7 +24,7 @@ run: # Run the application
 
 setup: # Initial project setup
 	@echo "Creating virtual env at: $(VENV_DIR)"s
-	@python3 -m venv $(VENV_DIR)
+	@$(PYTHON_VERSION) -m venv $(VENV_DIR)
 	@echo "Installing dependencies..."
 	@source $(VENV_DIR)/bin/activate && pip install -r requirements/requirements-dev.txt && pip install -r requirements/requirements.txt
 	@echo -e "\n✅ Done.\n🎉 Run the following commands to get started:\n\n ➡️ source $(VENV_DIR)/bin/activate\n ➡️ make run\n"
