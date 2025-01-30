@@ -18,6 +18,8 @@ Watch the video 👇
 <img src="https://i.imgur.com/rJJaHmG.png" width="400">
 </a>
 
+🐙 [**Codebase**](https://github.com/yankeexe/llm-rag-with-reranker-demo/tree/semantic-cache)
+
 
 ## 🤖 Prerequisites
 
