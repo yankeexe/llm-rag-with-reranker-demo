@@ -1,3 +1,10 @@
+"""Helper module demonstrating CSV cache data ingestion.
+
+This module provides a simple example of how to create and write data to a CSV file
+for caching purposes. It demonstrates basic CSV file handling using Python's csv module
+to store question-answer pairs.
+"""
+
 import csv
 
 data = [

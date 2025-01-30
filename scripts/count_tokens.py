@@ -1,3 +1,13 @@
+"""
+Helper module to count the number of tokens before passing it to the embedding model.
+
+Attributes:
+    content (str): Sample text content about AWS AI/ML candidate requirements
+    tokenizer: Pre-trained tokenizer model from Nomic AI
+    tokens (list): Tokenized text content
+    token_count (int): Number of tokens in the content
+"""
+
 from transformers import AutoTokenizer
 
 content = """
