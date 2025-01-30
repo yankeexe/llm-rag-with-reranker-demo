@@ -3,7 +3,7 @@ SHELL :=/bin/bash
 .PHONY: clean check setup
 .DEFAULT_GOAL=help
 VENV_DIR = .venv
-PYTHON_VERSION = python3.10
+PYTHON_VERSION = python3.11
 
 check: # Ruff check
 	@ruff check .
