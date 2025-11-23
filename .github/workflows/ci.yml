@@ -1,5 +1,5 @@
 name: Check lint rules
-on:
+on: 
   push:
     branches:
       - '*'
